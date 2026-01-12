@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Leaderboard | Madness</title>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <div class="header-top">
+          <h1 >Madness Player Rankings</h1>
+          <a
+            href="https://discord.gg/6ZRqFhQ6"
+            class="server-link"
+            target="_blank"
+            >Join Discord</a
+          >
+        </div> <br>
+        <p class="subtitle">
+          eFootball Madness Player Rankings. Click rows to view Profile.
+          <br>
+          <div class="live-status">
+          <div class="pulse-icon"></div>
+          <div id="current-timestamp" class="timestamp-text"></div>
+        </div>
+        </p>
+        
+      </header>
+
+      <br />
+      <div class="controls-bar">
+        <div class="search-wrapper">
+          <input
+            type="text"
+            id="search-input"
+            class="search-input"
+            placeholder="Search players..."
+            oninput="handleSearch()"
+          />
+        </div>
+        <button class="sort-btn" onclick="toggleSort()">
+          Points <span id="sort-icon">▼</span>
+        </button>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="rank-cell">#</th>
+              <th>Player</th>
+              <th class="points-cell">Points</th>
+            </tr>
+          </thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
+
+      <footer class="main-footer">
+        <p>
+          Created by <strong>Aggu</strong> &copy; 2026 Copyright. All Rights
+          Reserved.
+        </p>
+      </footer>
+    </div>
+
+    <script>
+      let players = [];
+      let searchTerm = "";
+      let sortDir = "desc";
+
+      async function init() {
+        const now = new Date();
+        const options = {
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        };
+        document.getElementById(
+          "current-timestamp"
+        ).innerText = `Rankings as of ${now.toLocaleString("en-US", options)}`;
+
+        try {
+          const res = await fetch("players.json");
+          players = await res.json();
+          renderTable();
+        } catch (err) {
+          console.error("Data Load Failed:", err);
+        }
+      }
+
+      function renderTable() {
+        const body = document.getElementById("table-body");
+        let filtered = players.filter(
+          (p) =>
+            p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            p.username.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+
+        filtered.sort((a, b) =>
+          sortDir === "desc" ? b.points - a.points : a.points - b.points
+        );
+
+        body.innerHTML = filtered
+          .map((p, i) => {
+            const rank = i + 1;
+            let rankClass = "";
+            let rankDisplay = rank;
+
+            if (sortDir === "desc" && rank <= 3) {
+              rankClass = `rank-${rank}`;
+              rankDisplay = `<span class="medal">${rank}</span>`;
+            }
+
+            const bannerStyle = p.banner_url
+              ? `background-image: url('${p.banner_url}')`
+              : `background-color: #${(p.banner_color || 0x27272a)
+                  .toString(16)
+                  .padStart(6, "0")}`;
+
+            return `
+                    <tr class="player-row ${rankClass}" id="row-${
+              p.id
+            }" onclick="toggleRow('${p.id}')">
+                        <td class="rank-cell">${rankDisplay}</td>
+                        <td>
+                            <div class="player-profile-compact">
+                                <img src="${
+                                  p.avatar ||
+                                  "https://cdn.discordapp.com/embed/avatars/0.png"
+                                }" class="avatar-sm">
+                                <div class="name-box">
+                                    <span class="display-name">${p.name}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="points-cell">${p.points}</td>
+                    </tr>
+                    <tr id="details-${p.id}" class="details-row">
+                        <td colspan="3">
+                            <div class="animation-wrapper">
+                                <div class="details-content">
+                                    <div class="card-padding">
+                                        <div class="profile-card">
+                                            <div class="profile-banner" style="${bannerStyle}"></div>
+                                            <div class="profile-header">
+                                                <img src="${
+                                                  p.avatar ||
+                                                  "https://cdn.discordapp.com/embed/avatars/0.png"
+                                                }" class="avatar-lg">
+                                            </div>
+                                            <div class="profile-body">
+                                                <div class="name-title">
+                                                    <h2>${p.name}</h2>
+                                                    <div class="username-handle">@${
+                                                      p.username
+                                                    }</div>
+                                                </div>
+                                                <div class="stats-grid">
+                                                    <div class="stat-box">
+                                                        <span class="stat-label">RANK</span>
+                                                        <span class="stat-value">#${rank}</span>
+                                                    </div>
+                                                    <div class="stat-box">
+                                                        <span class="stat-label">POINTS</span>
+                                                        <span class="stat-value">${
+                                                          p.points
+                                                        }</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+          })
+          .join("");
+      }
+
+      function handleSearch() {
+        searchTerm = document.getElementById("search-input").value;
+        renderTable();
+      }
+
+      function toggleSort() {
+        sortDir = sortDir === "desc" ? "asc" : "desc";
+        document.getElementById("sort-icon").innerText =
+          sortDir === "desc" ? "▼" : "▲";
+        renderTable();
+      }
+
+      function toggleRow(id) {
+        const detailRow = document.getElementById(`details-${id}`);
+        const masterRow = document.getElementById(`row-${id}`);
+        const isActive = detailRow.classList.contains("active");
+
+        document
+          .querySelectorAll(".details-row")
+          .forEach((r) => r.classList.remove("active"));
+        document
+          .querySelectorAll(".player-row")
+          .forEach((r) => r.classList.remove("expanded"));
+
+        if (!isActive) {
+          detailRow.classList.add("active");
+          masterRow.classList.add("expanded");
+        }
+      }
+
+      init();
+    </script>
+  </body>
+</html>

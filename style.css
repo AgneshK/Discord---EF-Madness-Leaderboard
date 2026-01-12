@@ -1,0 +1,442 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap");
+:root {
+  --background: #000000;
+  --foreground: #fafafa;
+  --card: #09090b;
+  --muted: #18181b;
+  --muted-foreground: #a1a1aa;
+  --border: #27272a;
+  --radius: 0.8rem;
+  --discord-dark: #111214;
+  --discord-black: #08090a;
+  font-family: "Source Code Pro", monospace;
+  font-optical-sizing: auto;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+  line-height: 1.5;
+  scrollbar-width: none;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+::selection {
+  background-color: #fafafa;
+  color: black;
+}
+
+.container {
+  width: 100%;
+  max-width: 720px;
+}
+
+header {
+  margin-bottom: 2rem;
+}
+h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  margin-bottom: 0.5rem;
+}
+.subtitle {
+  color: var(--muted-foreground);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* --- CONTROLS --- */
+.controls-bar {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.search-input {
+  flex-grow: 1;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: white;
+  padding: 0.8rem 1rem;
+  font-family: inherit;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.search-input:focus {
+  border-color: #535354;
+  box-shadow: 0 0 0 2px rgba(88, 101, 242, 0.2);
+}
+
+.sort-btn {
+  background: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: white;
+  padding: 0 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: 0.2s;
+}
+
+.sort-btn:hover {
+  background: var(--border);
+  transform: translateY(-1px);
+}
+
+/* --- TABLE --- */
+.table-container {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  overflow: hidden;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th {
+  padding: 1.2rem 1rem;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  letter-spacing: 0.1em;
+}
+
+.player-row {
+  cursor: pointer;
+  transition: 0.2s;
+}
+.player-row:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+.player-row.expanded {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.rank-cell {
+  width: 80px;
+  text-align: center;
+  color: var(--muted-foreground);
+  font-weight: 700;
+}
+.points-cell {
+  text-align: right;
+  font-family: "Source Code Pro";
+  font-weight: 800;
+  padding-right: 1.5rem;
+  color: #fff;
+}
+
+/* --- MEDALS --- */
+.medal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  color: #000;
+}
+.rank-1 .medal {
+  background: linear-gradient(135deg, #ffd700, #b8860b);
+  box-shadow: 0 0 15px rgba(218, 165, 32, 0.4);
+}
+.rank-2 .medal {
+  background: linear-gradient(135deg, #e0e0e0, #808080);
+  box-shadow: 0 0 15px rgba(192, 192, 192, 0.3);
+}
+.rank-3 .medal {
+  background: linear-gradient(135deg, #cd7f32, #8b4513);
+  box-shadow: 0 0 15px rgba(205, 127, 50, 0.3);
+}
+
+/* --- COMPACT PLAYER VIEW --- */
+.player-profile-compact {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.avatar-sm {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+}
+.display-name {
+  font-weight: 700;
+  font-size: 1rem;
+}
+.view-hint {
+  font-size: 0.65rem;
+  margin-left: 10px;
+  color: #5c5c5c;
+  font-weight: 600;
+  opacity: 0;
+  transition: 0.2s;
+}
+.player-row:hover .view-hint {
+  opacity: 1;
+}
+
+/* --- EXCITING EXPANDED CARD --- */
+.details-row td {
+  padding: 0;
+  border: none;
+}
+.animation-wrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.details-row.active .animation-wrapper {
+  grid-template-rows: 1fr;
+}
+.details-content {
+  overflow: hidden;
+}
+
+.card-padding {
+  padding: 1.5rem;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.profile-card {
+  background: var(--discord-dark);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  position: relative;
+}
+
+.profile-banner {
+  height: 120px;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.profile-banner::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60%;
+  background: linear-gradient(transparent, var(--discord-dark));
+}
+
+.profile-header {
+  padding: 0 1.5rem;
+  margin-top: -50px;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.avatar-lg {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 6px solid var(--discord-dark);
+  background: var(--discord-dark);
+}
+
+.profile-body {
+  padding: 1.5rem;
+}
+
+.name-title h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.username-handle {
+  color: var(--muted-foreground);
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Animated Stat Tiles */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.stat-box {
+  background: var(--discord-black);
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: 0.3s;
+}
+
+.stat-box:hover {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.stat-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--muted-foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+/* Entrance Animation for Content */
+.details-row.active .stat-box {
+  animation: slideUp 0.5s ease forwards;
+  opacity: 0;
+}
+
+.details-row.active .stat-box:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* HEADER & SERVER LINK */
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.server-link {
+  color: #5865f2; /* Discord Blurple */
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 6px 12px;
+  border: 1px solid #5865f2;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.server-link:hover {
+  background: #5865f2;
+  color: white;
+  box-shadow: 0 0 15px rgba(88, 101, 242, 0.4);
+}
+
+/* LIVE STATUS & GLOWING ICON */
+.live-status {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.timestamp-text {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  font-weight: 500;
+}
+
+.pulse-icon {
+  width: 8px;
+  height: 8px;
+  background-color: #22c55e; /* Green */
+  border-radius: 50%;
+  position: relative;
+}
+
+.pulse-icon::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: #22c55e;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(3.5);
+    opacity: 0;
+  }
+}
+
+/* FOOTER */
+.main-footer {
+  margin-top: 4rem;
+  padding: 2rem 0;
+  text-align: center;
+  border-top: 1px solid var(--border);
+}
+
+.main-footer p {
+  font-size: 0.8rem;
+  color: var(--muted-foreground);
+}
+
+.main-footer strong {
+  color: var(--foreground);
+}
+
+.server-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.header-top a {
+  text-align: center;
+  font-size: 0.8rem;
+}
